@@ -1,24 +1,44 @@
-import zero.ui.Label;
-import zero.ui.TextField;
-import zero.ui.Button;
-import zero.ui.Column;
-import zero.App;
+import zero.Key;
+import zero.Color;
+import zero.GameApp;
 
-public class Main extends App {
-    @Override public void settings(){
-        title("Greeting");
-        size(420,240);
+public class Main extends GameApp {
+    private Player player;
+    private Coin coin;
+    private int points;
+    @Override public void settings() {
         padding(20);
+        size(640, 400);
     }
-    
 
-    public void setup() {
-        Label greeting = new Label("Hello, Java!");
-        TextField name = new TextField();
-        name.setPromptText("Your name");
-        Button button = new Button("Say hello");
-        button.onClick(() -> greeting.setText("Hello, "+name.getText()+"!"));
-        show(new Column(10,greeting,name, button));
+    @Override public void setup() {
+        player = new Player(40, 180);
+        coin = new Coin(220, 180);
     }
+
+    @Override public void update(double seconds) {
+        int horizontal = 0;
+        int vertical = 0;
+        if (keyDown(Key.LEFT)) horizontal--;
+        if (keyDown(Key.RIGHT)) horizontal++;
+        if (keyDown(Key.UP)) vertical--;
+        if (keyDown(Key.DOWN)) vertical++;
+        player.update(horizontal, vertical, seconds, width(), height());
+        if (!coin.isCollected() && coin.touches(player)) {
+            coin.collect();
+            points++;
+        }
+    }
+
+    @Override public void draw() {
+        background(Color.rgb(240, 248, 255));
+        fill(Color.rgb(47, 79, 79));
+        textSize(20);
+        text("Click the canvas, then hold the arrow keys.", 20, 30);
+        text("Score: " + points, 20, 60);
+        coin.draw(this);
+        player.draw(this);
+    }
+
     public static void main(String[] args) { launch(args); }
-}
+    }
